@@ -5,7 +5,13 @@ Go version of HSR reminder, this reminder will fetch the train information based
 
 ## Usage
 
-Fill up the env variables and execute the command.
+Create `.env` and fill up the env variables.
+
+```
+cp .env.example .env
+```
+
+Execute bin file.
 
 ```
 ./hsr-reminder
