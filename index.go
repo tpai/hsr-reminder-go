@@ -66,9 +66,11 @@ func HandleRequest() {
 	}
 	response := string(bodyBytes)
 
-	code := gjson.Get(response, "resultCode")
+	code := gjson.Get(response, "resultValue.dataStatus")
+	message := gjson.Get(response, "resultValue.dataStatusMessage")
 	trains := gjson.Get(response, "resultValue.trains").Array()
-	if code.String() == "100" {
+
+	if code.String() == "000" && len(trains) != 0 {
 		restTrains := make([]gjson.Result, 3)
 		if len(trains) >= 3 {
 			copy(restTrains, trains[0:3])
@@ -82,7 +84,9 @@ func HandleRequest() {
 		}
 		output, _ := json.Marshal(obj)
 		result := sendNotification(output)
-		println(result)
+		fmt.Println(result)
+	} else {
+		panic(message.String())
 	}
 }
 
