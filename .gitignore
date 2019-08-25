@@ -16,3 +16,9 @@
 
 # Environment variables
 .env
+
+# Archive files
+*.zip
+
+# Lambda artifact
+lambda-*
