@@ -71,11 +71,9 @@ func HandleRequest() {
 	trains := gjson.Get(response, "resultValue.trains").Array()
 
 	if code.String() == "000" && len(trains) != 0 {
-		restTrains := make([]gjson.Result, 3)
-		if len(trains) >= 3 {
-			copy(restTrains, trains[0:3])
-		} else {
-			copy(restTrains, trains)
+		var restTrains []gjson.Result
+		for _, v := range trains {
+			restTrains = append(restTrains, v)
 		}
 		obj := map[string]interface{}{}
 		for key, train := range restTrains {
