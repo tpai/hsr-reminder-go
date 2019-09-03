@@ -1,0 +1,27 @@
+{
+  "name": "hsr-reminder-go",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-demo": "cdk/index.js"
+  },
+  "scripts": {
+    "go:build": "GOARCH=amd64 GOOS=linux go build -o lambda-hsr_reminder *.go",
+    "go:zip": "zip -r lambda-hsr_reminder.zip lambda-hsr_reminder",
+    "go:zip:hash": "zip -r ${PWD##*/}_$(date +%s).zip lambda-hsr_reminder",
+    "ts:build": "tsc",
+    "ts:watch": "tsc -w",
+    "build": "yarn go:build && yarn go:zip && yarn ts:build",
+    "deploy": "yarn build && cdk deploy"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.3",
+    "typescript": "^3.6.2"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-events": "^1.6.1",
+    "@aws-cdk/aws-events-targets": "^1.6.1",
+    "@aws-cdk/aws-lambda": "^1.6.1",
+    "@aws-cdk/core": "^1.6.1",
+    "dotenv": "^8.1.0"
+  }
+}

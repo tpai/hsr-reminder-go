@@ -17,18 +17,22 @@ Execute bin file.
 ./hsr-reminder
 ```
 
-## Deploy to lambda
+## Deploy
 
-Build binary file for lambda
-
-```
-GOARCH=amd64 GOOS=linux go build -o lambda-hsr_reminder *.go
-```
-
-Archive to zip file
+Install aws-cdk CLI
 
 ```
-zip -r ${PWD##*/}_$(date +%s).zip lambda-hsr_reminder
+yarn global add aws-cdk
 ```
 
-Upload to lambda and set `Handler` to `lambda-hsr_reminder`
+Initialize stack
+
+```
+yarn cdk bootstrap
+```
+
+Run deploy script
+
+```
+yarn deploy
+```
