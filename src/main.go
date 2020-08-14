@@ -1,18 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
-	"net/url"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/imroc/req"
 	"github.com/joho/godotenv"
 	"github.com/tidwall/gjson"
 )
@@ -39,25 +36,30 @@ func HandleRequest() {
 		}
 	}
 
-	data := url.Values{}
-	data.Set("from", os.Getenv("FROM"))
-	data.Set("to", os.Getenv("TO"))
-	data.Set("date", os.Getenv("DATE"))
-	data.Set("timetable", os.Getenv("TIMETABLE"))
-	data.Set("ticketcount", os.Getenv("TICKETCOUNT"))
-	data.Set("carriagecategory", os.Getenv("CARRIAGECATEGORY"))
-	data.Set("onlyshowdiscount", os.Getenv("ONLYSHOWDISCOUNT"))
-	data.Set("collegestudents", os.Getenv("COLLEGESTUDENTS"))
-	data.Set("deviceid", os.Getenv("DEVICEID"))
-	data.Set("deviceidhash", os.Getenv("DEVICEIDHASH"))
-	data.Set("devicecategory", os.Getenv("DEVICECATEGORY"))
-	data.Set("appversion", os.Getenv("APPVERSION"))
-	data.Set("parameterversion", os.Getenv("PARAMETERVERSION"))
-
-	req, _ := http.NewRequest("POST", os.Getenv("ENDPOINT"), strings.NewReader(data.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Add("User-Agent", "ETSiPhone/4.9.5")
-	res, _ := http.DefaultClient.Do(req)
+	headers := req.Header{
+		"Content-Type": "application/x-www-form-urlencoded",
+		"User-Agent":   "ETSiPhone/4.9.5",
+	}
+	params := req.QueryParam{
+		"from":             os.Getenv("FROM"),
+		"to":               os.Getenv("TO"),
+		"date":             os.Getenv("DATE"),
+		"timetable":        os.Getenv("TIMETABLE"),
+		"ticketcount":      os.Getenv("TICKETCOUNT"),
+		"carriagecategory": os.Getenv("CARRIAGECATEGORY"),
+		"onlyshowdiscount": os.Getenv("ONLYSHOWDISCOUNT"),
+		"collegestudents":  os.Getenv("COLLEGESTUDENTS"),
+		"deviceid":         os.Getenv("DEVICEID"),
+		"deviceidhash":     os.Getenv("DEVICEIDHASH"),
+		"devicecategory":   os.Getenv("DEVICECATEGORY"),
+		"appversion":       os.Getenv("APPVERSION"),
+		"parameterversion": os.Getenv("PARAMETERVERSION"),
+	}
+	r, err := req.Post(os.Getenv("ENDPOINT"), headers, params)
+	if err != nil {
+		log.Fatal(err)
+	}
+	res := r.Response()
 
 	defer res.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(res.Body)
@@ -89,14 +91,15 @@ func HandleRequest() {
 }
 
 func sendNotification(payload []byte) string {
-	req, _ := http.NewRequest("POST", os.Getenv("WEBHOOK"), bytes.NewBuffer(payload))
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	headers := req.Header{
+		"Content-Type": "application/json",
+	}
+	r, err := req.Post(os.Getenv("WEBHOOK"), headers, req.BodyJSON(payload))
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	res := r.Response()
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
 	return string(body)
 }
