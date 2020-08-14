@@ -5,6 +5,7 @@
     "cdk-demo": "cdk/index.js"
   },
   "scripts": {
+    "dev": "go run src/*.go",
     "go:build": "GOARCH=amd64 GOOS=linux go build -o lambda-hsr_reminder src/*.go",
     "go:zip": "zip -r lambda-hsr_reminder.zip lambda-hsr_reminder",
     "go:zip:hash": "zip -r ${PWD##*/}_$(date +%s).zip lambda-hsr_reminder",
